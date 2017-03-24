@@ -1,7 +1,18 @@
 FROM ubuntu:trusty
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
-ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive QT_SELECT=qt5
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    QT_SELECT=qt5 \
+    PHANTOMJS_CDNURL=http://npm.taobao.org/mirrors/phantomjs \
+    CHROMEDRIVER_CDNURL=http://npm.taobao.org/mirrors/chromedriver \
+    SELENIUM_CDNURL=http://npm.taobao.org/mirrorss/selenium \
+    NVM_NODEJS_ORG_MIRROR=http://npm.taobao.org/mirrors/node \
+    NVM_IOJS_ORG_MIRROR=http://npm.taobao.org/mirrors/iojs
+
+COPY sources.list /etc/apt/sources.list
 
 RUN apt-get -y update && \
     apt-get install --force-yes -yq apt-transport-https locales software-properties-common curl && \
@@ -38,7 +49,14 @@ RUN apt-get -y update && \
     npm install -g grunt-cli && \
     npm cache clean && \
     pip install awscli && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    npm config set registry https://registry.npm.taobao.org && \
+    npm config set disturl https://npm.taobao.org/dist && \
+    npm config set operadriver_cdnurl http://cdn.npm.taobao.org/dist/operadriver && \
+    npm config set fse_binary_host_mirror https://npm.taobao.org/mirrors/fsevents && \
+    npm config set sass_binary_site http://cdn.npm.taobao.org/dist/node-sass && \
+    npm config set electron_mirror http://cdn.npm.taobao.org/dist/electron/ && \
+    curl -a -o /etc/hosts  https://raw.githubusercontent.com/racaljk/hosts/master/hosts
 
 ADD build.sh /app/onlyoffice/build.sh
 
